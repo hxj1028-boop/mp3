@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>懶覺的歌曲</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Kosugi+Maru&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        /* 視覺風格：溫暖米色背景、紋理感 */
+        body {
+            font-family: 'Kosugi Maru', sans-serif;
+            background-color: #F4EEDC; /* 舊紙張米色 */
+            background-image: radial-gradient(#e2d5ba 1px, transparent 1px);
+            background-size: 20px 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            color: #4A3B2C;
+        }
+
+        /* 木質窗框風格播放器 */
+        .player-container {
+            background-color: #FAFAFA;
+            width: 350px;
+            padding: 30px;
+            border-radius: 40px; /* 極度圓潤的邊角 */
+            border: 8px solid #8B5A2B; /* 木質棕邊框 */
+            box-shadow: 0 15px 35px rgba(139, 90, 43, 0.3); /* 柔和棕色陰影 */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+        }
+
+        /* 裝飾性葉子 */
+        .decoration-leaf-1 { position: absolute; top: 15px; left: 20px; color: #2E8B57; font-size: 1.2rem; transform: rotate(-20deg); }
+        .decoration-leaf-2 { position: absolute; bottom: 20px; right: 20px; color: #6B8E23; font-size: 1.5rem; transform: rotate(30deg); }
+
+        /* 隨機封面區域 */
+        .cover-art {
+            width: 150px;
+            height: 150px;
+            background-color: #E8F5E9; /* 淺森林綠底色 */
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 5rem;
+            color: #2E8B57; /* 森林深綠 */
+            margin-bottom: 20px;
+            box-shadow: inset 0 5px 15px rgba(0,0,0,0.05);
+            transition: all 0.5s ease;
+        }
+
+        /* 標題區域 */
+        .title-area {
+            text-align: center;
+            margin-bottom: 20px;
+            width: 100%;
+        }
+        .main-title {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #2E8B57;
+            margin: 0 0 5px 0;
+        }
+        .sub-title {
+            font-size: 0.9rem;
+            color: #8B5A2B;
+            margin: 0;
+        }
+
+        /* 進度條 (天空藍) */
+        .progress-container {
+            width: 100%;
+            margin-bottom: 15px;
+        }
+        input[type="range"] {
+            -webkit-appearance: none;
+            width: 100%;
+            height: 8px;
+            background: #d3d3d3;
+            border-radius: 5px;
+            outline: none;
+            cursor: pointer;
+        }
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: #87CEEB; /* 天空藍 */
+            cursor: pointer;
+            box-shadow: 0 0 5px rgba(135, 206, 235, 0.6);
+        }
+        .time-display {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.8rem;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        /* 控制按鈕 */
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            margin-bottom: 20px;
+        }
+        .controls button {
+            background: none;
+            border: none;
+            color: #8B5A2B; /* 木質棕 */
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .controls button:hover {
+            color: #2E8B57; /* 懸停變深綠 */
+            transform: scale(1.1);
+        }
+        .play-pause-btn {
+            background-color: #2E8B57 !important;
+            color: white !important;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.5rem !important;
+            box-shadow: 0 5px 15px rgba(46, 139, 87, 0.4);
+        }
+
+        /* 播放模式狀態顏色 */
+        .active-mode { color: #2E8B57 !important; }
+        .inactive-mode { color: #ccc !important; }
+
+        /* 音量控制 */
+        .volume-container {
+            display: flex;
+            align-items: center;
+            width: 100%;
+            margin-bottom: 20px;
+            color: #8B5A2B;
+        }
+        .volume-container i { width: 25px; text-align: center; }
+        .volume-container input { margin: 0 10px; }
+
+        /* 搜尋框 */
+        .search-box {
+            width: 100%;
+            padding: 10px 15px;
+            border-radius: 20px;
+            border: 2px solid #e0d8c8;
+            background: #fffdf9;
+            font-family: inherit;
+            box-sizing: border-box;
+            margin-bottom: 15px;
+            outline: none;
+            color: #4A3B2C;
+        }
+        .search-box:focus { border-color: #2E8B57; }
+
+        /* 播放清單 */
+        .playlist {
+            width: 100%;
+            max-height: 150px;
+            overflow-y: auto;
+            border-top: 2px dashed #dcbca3;
+            padding-top: 10px;
+        }
+        /* 自訂滾動條 */
+        .playlist::-webkit-scrollbar { width: 6px; }
+        .playlist::-webkit-scrollbar-thumb { background-color: #8B5A2B; border-radius: 10px; }
+        
+        .playlist-item {
+            padding: 10px 15px;
+            border-radius: 15px;
+            margin-bottom: 5px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            transition: 0.3s;
+            font-size: 0.95rem;
+        }
+        .playlist-item:hover {
+            background-color: #f0eadd;
+        }
+        /* 高亮顯示播放中歌曲 */
+        .playlist-item.playing {
+            background-color: #C8E6C9; /* 淺綠色背景 */
+            color: #1b5e20;
+            font-weight: bold;
+        }
+        .leaf-icon {
+            margin-right: 10px;
+            color: #2E8B57;
+            opacity: 0; /* 預設隱藏 */
+        }
+        .playlist-item.playing .leaf-icon {
+            opacity: 1; /* 播放時顯示小葉子 */
+        }
+    </style>
+</head>
+<body>
+
+    <div class="player-container">
+        <i class="fas fa-leaf decoration-leaf-1"></i>
+        <i class="fas fa-seedling decoration-leaf-2"></i>
+
+        <div class="cover-art" id="coverArt">
+            <i class="fas fa-tree"></i>
+        </div>
+
+        <div class="title-area">
+            <h1 class="main-title" id="mainTitle">懶覺</h1>
+            <p class="sub-title">MP3撥放器</p>
+        </div>
+
+        <div class="progress-container">
+            <input type="range" id="progressBar" value="0" min="0" max="100">
+            <div class="time-display">
+                <span id="currentTime">0:00</span>
+                <span id="duration">0:00</span>
+            </div>
+        </div>
+
+        <div class="controls">
+            <button id="shuffleBtn" class="inactive-mode" title="隨機播放"><i class="fas fa-random"></i></button>
+            <button id="prevBtn" title="上一首"><i class="fas fa-backward-step"></i></button>
+            <button id="playBtn" class="play-pause-btn"><i class="fas fa-play" id="playIcon"></i></button>
+            <button id="nextBtn" title="下一首"><i class="fas fa-forward-step"></i></button>
+            <button id="repeatBtn" class="inactive-mode" title="循環模式"><i class="fas fa-repeat" id="repeatIcon"></i></button>
+        </div>
+
+        <div class="volume-container">
+            <i class="fas fa-volume-down"></i>
+            <input type="range" id="volumeBar" value="100" min="0" max="100">
+            <i class="fas fa-volume-up"></i>
+        </div>
+
+        <input type="text" id="searchInput" class="search-box" placeholder="🔍 搜尋編號或英文路徑...">
+
+        <div class="playlist" id="playlist">
+            </div>
+
+        <audio id="audioElement"></audio>
+    </div>
+
+    <script>
+        // 1. 播放清單資料 (替換為直連網址確保能播放)
+        const musicFiles = [
+            'https://raw.githubusercontent.com/hxj1028-boop/mp3/main/song1.mp3',
+            'https://raw.githubusercontent.com/hxj1028-boop/mp3/main/song2.mp3',
+            'https://raw.githubusercontent.com/hxj1028-boop/mp3/main/song3.mp3'
+        ];
+
+        // 封面圖示庫
+        const coverIcons = ['fa-seedling', 'fa-cloud', 'fa-sun', 'fa-tree', 'fa-leaf', 'fa-wind', 'fa-canadian-maple-leaf'];
+
+        // DOM 元素
+        const audio = document.getElementById('audioElement');
+        const playBtn = document.getElementById('playBtn');
+        const playIcon = document.getElementById('playIcon');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const shuffleBtn = document.getElementById('shuffleBtn');
+        const repeatBtn = document.getElementById('repeatBtn');
+        const repeatIcon = document.getElementById('repeatIcon');
+        
+        const progressBar = document.getElementById('progressBar');
+        const currentTimeEl = document.getElementById('currentTime');
+        const durationEl = document.getElementById('duration');
+        const volumeBar = document.getElementById('volumeBar');
+        
+        const mainTitle = document.getElementById('mainTitle');
+        const coverArt = document.getElementById('coverArt');
+        const playlistContainer = document.getElementById('playlist');
+        const searchInput = document.getElementById('searchInput');
+
+        // 狀態變數
+        let currentIndex = 0;
+        let isPlaying = false;
+        let isShuffle = false;
+        let repeatMode = 0; // 0: 不循環, 1: 全部循環, 2: 單曲循環
+
+        // 格式化數字 (例如: 1 -> "01")
+        const formatNumber = (num) => String(num).padStart(2, '0');
+        
+        // 格式化時間 (秒 -> mm:ss)
+        const formatTime = (seconds) => {
+            if (isNaN(seconds)) return "0:00";
+            const min = Math.floor(seconds / 60);
+            const sec = Math.floor(seconds % 60);
+            return `${min}:${sec < 10 ? '0' : ''}${sec}`;
+        };
+
+        // 初始化播放清單 UI
+        function initPlaylist() {
+            playlistContainer.innerHTML = '';
+            musicFiles.forEach((path, index) => {
+                const trackNum = formatNumber(index + 1);
+                
+                const item = document.createElement('div');
+                item.className = 'playlist-item';
+                // 儲存資訊用於搜尋比對
+                item.dataset.index = index;
+                item.dataset.num = trackNum;
+                item.dataset.path = path.toLowerCase();
+                
+                item.innerHTML = `
+                    <i class="fas fa-leaf leaf-icon"></i>
+                    <span>Track ${trackNum}</span>
+                `;
+                
+                item.addEventListener('click', () => {
+                    currentIndex = index;
+                    loadSong(currentIndex);
+                    playSong();
+                });
+                
+                playlistContainer.appendChild(item);
+            });
+        }
+
+        // 載入歌曲
+        function loadSong(index) {
+            audio.src = musicFiles[index];
+            const trackNum = formatNumber(index + 1);
+            
+            // 隨機切換封面
+            const randomIcon = coverIcons[Math.floor(Math.random() * coverIcons.length)];
+            coverArt.innerHTML = `<i class="fas ${randomIcon}"></i>`;
+            
+            // 處理標題：如果正在播放/已載入，顯示 Track 0X
+            mainTitle.innerText = `Track ${trackNum}`;
+            
+            // 更新播放清單高亮
+            document.querySelectorAll('.playlist-item').forEach((item, i) => {
+                if (i === index) {
+                    item.classList.add('playing');
+                } else {
+                    item.classList.remove('playing');
+                }
+            });
+        }
+
+        // 播放與暫停
+        function playSong() {
+            isPlaying = true;
+            playIcon.classList.replace('fa-play', 'fa-pause');
+            audio.play();
+        }
+
+        function pauseSong() {
+            isPlaying = false;
+            playIcon.classList.replace('fa-pause', 'fa-play');
+            audio.pause();
+            // 暫停時如果想要變回預設標題可取消下行註解，但通常保留 Track 號碼體驗較好
+            // mainTitle.innerText = "懶覺"; 
+        }
+
+        playBtn.addEventListener('click', () => {
+            isPlaying ? pauseSong() : playSong();
+        });
+
+        // 上下首切換
+        function prevSong() {
+            if (isShuffle) {
+                currentIndex = Math.floor(Math.random() * musicFiles.length);
+            } else {
+                currentIndex = (currentIndex - 1 + musicFiles.length) % musicFiles.length;
+            }
+            loadSong(currentIndex);
+            if(isPlaying) playSong();
+        }
+
+        function nextSong(autoNext = false) {
+            if (isShuffle) {
+                currentIndex = Math.floor(Math.random() * musicFiles.length);
+            } else {
+                // 如果是自動換歌且「不循環」，到最後一首就停止
+                if (autoNext && repeatMode === 0 && currentIndex === musicFiles.length - 1) {
+                    pauseSong();
+                    return;
+                }
+                currentIndex = (currentIndex + 1) % musicFiles.length;
+            }
+            loadSong(currentIndex);
+            if(isPlaying || autoNext) playSong();
+        }
+
+        prevBtn.addEventListener('click', prevSong);
+        nextBtn.addEventListener('click', () => nextSong(false));
+
+        // 歌曲結束時的邏輯
+        audio.addEventListener('ended', () => {
+            if (repeatMode === 2) {
+                // 單曲循環
+                audio.currentTime = 0;
+                playSong();
+            } else {
+                nextSong(true);
+            }
+        });
+
+        // 播放模式切換 (隨機)
+        shuffleBtn.addEventListener('click', () => {
+            isShuffle = !isShuffle;
+            shuffleBtn.className = isShuffle ? 'active-mode' : 'inactive-mode';
+        });
+
+        // 播放模式切換 (循環)
+        repeatBtn.addEventListener('click', () => {
+            repeatMode = (repeatMode + 1) % 3;
+            if (repeatMode === 0) {
+                // 不循環
+                repeatBtn.className = 'inactive-mode';
+                repeatIcon.className = 'fas fa-repeat';
+            } else if (repeatMode === 1) {
+                // 全部循環
+                repeatBtn.className = 'active-mode';
+                repeatIcon.className = 'fas fa-repeat';
+            } else {
+                // 單曲循環
+                repeatBtn.className = 'active-mode';
+                repeatIcon.className = 'fas fa-rotate-left'; // 改圖示表示單曲
+            }
+        });
+
+        // 進度條與時間更新
+        audio.addEventListener('timeupdate', () => {
+            if(isNaN(audio.duration)) return;
+            const progressPercent = (audio.currentTime / audio.duration) * 100;
+            progressBar.value = progressPercent;
+            currentTimeEl.innerText = formatTime(audio.currentTime);
+            
+            // 進度條背景色連動 (為了讓已播放段落維持藍色，可搭配 CSS 處理，這裡簡化)
+            progressBar.style.background = `linear-gradient(to right, #87CEEB ${progressPercent}%, #d3d3d3 ${progressPercent}%)`;
+        });
+
+        audio.addEventListener('loadedmetadata', () => {
+            durationEl.innerText = formatTime(audio.duration);
+        });
+
+        // 點擊拖曳進度條
+        progressBar.addEventListener('input', (e) => {
+            const seekTime = (e.target.value / 100) * audio.duration;
+            audio.currentTime = seekTime;
+        });
+
+        // 音量控制
+        volumeBar.addEventListener('input', (e) => {
+            audio.volume = e.target.value / 100;
+        });
+
+        // 搜尋功能即時篩選
+        searchInput.addEventListener('input', (e) => {
+            const keyword = e.target.value.toLowerCase();
+            const items = document.querySelectorAll('.playlist-item');
+            
+            items.forEach(item => {
+                const num = item.dataset.num;
+                const path = item.dataset.path;
+                
+                if (num.includes(keyword) || path.includes(keyword)) {
+                    item.style.display = 'flex';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        });
+
+        // 初始化執行
+        initPlaylist();
+        loadSong(currentIndex);
+        // 設定初始音量
+        audio.volume = 1; 
+
+    </script>
+</body>
+</html>
